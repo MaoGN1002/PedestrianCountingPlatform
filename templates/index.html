@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>行人计数可视化平台</title>
+    <!-- 引入一些基本的 CSS 样式，可根据需要添加更多样式 -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+            color: green;
+        }
+
+        .custom-img {
+            /* width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%; */
+            width: auto;  /* 自动调整宽度 */
+            height: auto;  /* 自动调整高度 */
+            max-width: 100%;  /* 确保图像不会超出容器宽度 */
+            max-height: 100%;  /* 确保图像不会超出容器高度 */
+        }
+    </style>
+</head>
+<body>
+    <h1>行人计数可视化平台</h1>
+    <!-- 表单部分，用于上传可见光和红外图像 -->
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="visible_image">上传可见光图像:</label>
+        <input type="file" name="visible_image" id="visible_image" required>
+        <br>
+        <label for="infrared_image">上传红外图像:</label>
+        <input type="file" name="infrared_image" id="infrared_image" required>
+        <br>
+        <input type="submit" value="提交">
+    </form>
+    <!-- 用于显示结果的区域 -->
+    <div id="result"></div>
+    <script>
+        // 定义一个异步函数 submitForm 来处理表单提交
+        async function submitForm(event) {
+            event.preventDefault();  // 阻止表单的默认提交行为
+            const formData = new FormData(event.target);  // 获取表单数据
+            try {
+                // 使用 fetch API 发送 POST 请求到后端的 /upload 端点
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                // 检查响应状态码是否为 200（成功）
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                // 将响应解析为 JSON 格式
+                const data = await response.json();
+                // 将结果显示在页面的 result 区域
+                // document.getElementById('result').innerText = data.result;
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<img src="${data.result}" alt="处理后的图像" class="custom-img">`;
+            } catch (error) {
+                // 显示错误信息
+                document.getElementById('result').innerText = `Error: ${error.message}`;
+            }
+        }
+        // 给表单添加事件监听器，当提交时调用 submitForm 函数
+        document.querySelector('form').addEventListener('submit', submitForm);
+    </script>
+</body>
+</html>
