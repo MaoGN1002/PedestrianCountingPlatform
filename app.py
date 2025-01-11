@@ -41,9 +41,13 @@ def upload():
         app.logger.error(f"Error occurred: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+# @app.route('/static/<filename>')
+# def send_video(filename):
+#     return send_from_directory('static', filename)
+
 @app.route('/static/<filename>')
 def send_video(filename):
-    return send_from_directory('static', filename)
+    return send_from_directory('static', filename, mimetype='video/mp4')
 
 if __name__ == '__main__':
     app.run(debug=True)
