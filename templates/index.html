@@ -2,12 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>视频处理平台</title>
+    <title>行人计数可视化平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+        color: #007BFF;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
         }
         input[type="submit"] {
             padding: 10px 20px;
@@ -16,6 +37,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         input[type="submit"]:hover {
             background-color: #0056b3;
@@ -24,26 +46,34 @@
             font-size: 20px;
             font-weight: bold;
             color: green;
+            /* margin-top: 10px; */
         }
-
-        /* 添加视频样式 */
         video {
             max-width: 100%;
             width: 600px;  /* 设置视频宽度 */
             height: auto;  /* 自动调整高度以保持宽高比 */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
-        
+
+        .header {
+        position: relative;
+        display: inline-block;
+    }
     </style>
 </head>
 <body>
-    <h1>视频处理平台</h1>
+    <h1>行人计数可视化平台</h1>
+    
     <!-- 表单部分，用于上传两段视频 -->
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <label for="video1">上传第一段视频:</label>
+        <label for="video1">上传可见光视频:</label>
         <input type="file" name="video1" id="video1" accept="video/*" required>
         <br>
-        <label for="video2">上传第二段视频:</label>
+        <label for="video2">上传红外线视频:</label>
         <input type="file" name="video2" id="video2" accept="video/*" required>
         <br>
         <input type="submit" value="提交">
@@ -55,6 +85,8 @@
         async function submitForm(event) {
             event.preventDefault();  // 阻止表单的默认提交行为
             const formData = new FormData(event.target);  // 获取表单数据
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = '处理中...';  // 显示“处理中”消息
             try {
                 // 使用 fetch API 发送 POST 请求到后端的 /upload 端点
                 const response = await fetch('/upload', {
@@ -68,7 +100,7 @@
                 // 将响应解析为 JSON 格式
                 const data = await response.json();
                 // 将结果显示在页面的 result 区域，并播放视频
-                const resultDiv = document.getElementById('result');
+                // const resultDiv = document.getElementById('result');
                 resultDiv.innerHTML = `<video controls>
                                           <source src="${data.result}" type="video/mp4">
                                           您的浏览器不支持 HTML5 视频标签。
